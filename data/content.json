@@ -1,0 +1,115 @@
+{
+  "scenes": [
+    {
+      "key": "cafe",
+      "press": "A",
+      "button": "ANC 버튼",
+      "video": "media/cafe.mp4",
+      "time": "2:00 PM",
+      "feat": "Active Noise Cancellation",
+      "sub": "시끄러운 공간에서, 나만 조용하게",
+      "title": "Café",
+      "desc": "사람으로 가득한 오후의 카페. 읽고 싶은 책이 있는데, 글자가 들어오지 않는다.",
+      "bg": [40, 44, 48],
+      "cardLabel": "카페, 오후 2시. 노이즈캔슬링 체험 열기",
+      "sectionLabel": "카페 노이즈캔슬링 체험",
+      "canvasLabel": "카페 창가 자리에서 바라본 책, 커피, 창밖의 분주한 거리",
+      "copyPos": "tl",
+      "light": false,
+      "scrub": false,
+      "eyebrow": "Café · 2:00 PM",
+      "before": { "title": "Too loud\nto read", "text": "웅성거림, 컵 소리, 커피머신. 글자가 눈에 들어오지 않는다." },
+      "after": { "title": "Noise off", "text": "소음이 꺼지자, 비로소 문장이 읽히기 시작했다." },
+      "status": { "on": "Noise cancelling on", "off": "Noise cancelling off" }
+    },
+    {
+      "key": "room",
+      "press": "K",
+      "button": "컨트롤 노브",
+      "video": "media/room.mp4",
+      "time": "5:00 PM",
+      "feat": "Signature Marshall Sound",
+      "sub": "익숙한 방에서, 무대 앞처럼 생생하게",
+      "title": "Bedroom",
+      "desc": "집으로 돌아와 침대에 걸터앉은 오후. 할 일도, 하고 싶은 일도 없는 시간.",
+      "bg": [66, 52, 34],
+      "cardLabel": "방, 오후 5시. 깊은 저음 체험 열기",
+      "sectionLabel": "방 깊은 저음 체험",
+      "canvasLabel": "블라인드 햇빛이 비치는 방의 벽과 떠다니는 먼지",
+      "copyPos": "mr",
+      "light": true,
+      "scrub": false,
+      "eyebrow": "Bedroom · 5:00 PM",
+      "before": { "title": "Another\nslow afternoon", "text": "햇빛 속 먼지만 멍하니 바라보는 오후." },
+      "after": { "title": "Feel the\nlow end", "text": "몸으로 먼저 느껴지는 저음. 마샬 시그니처 사운드." },
+      "status": { "on": "Playing · Signature sound", "off": "Music off" }
+    },
+    {
+      "key": "lake",
+      "press": "M",
+      "button": "M 버튼",
+      "video": "media/lake.mp4",
+      "time": "7:00 PM",
+      "feat": "Soundstage",
+      "sub": "탁 트인 풍경 속에서, 소리도 넓게",
+      "title": "Lake park",
+      "desc": "퇴근길에 들른 도심 속 호수공원. 해가 지는 게 아름다운데, 왠지 흐릿하게만 느껴진다.",
+      "bg": [70, 40, 34],
+      "cardLabel": "호수공원, 저녁 7시. 선명한 고음 체험 열기",
+      "sectionLabel": "호수공원 선명한 고음 체험",
+      "canvasLabel": "도심 호수공원 계단에 앉아 바라본 노을, 빌딩 스카이라인, 물 위의 반짝임",
+      "copyPos": "tc",
+      "light": false,
+      "scrub": true,
+      "eyebrow": "Lake park · 7:00 PM",
+      "before": { "title": "Everything\nsounds faded", "text": "해가 지는 게 아름다운데, 소리는 흐릿하게 뭉개진다." },
+      "after": { "title": "Hear every\ndetail", "text": "심벌의 떨림, 기타 줄의 울림까지. 선명한 고음." },
+      "status": { "on": "Soundstage on", "off": "Soundstage off" }
+    }
+  ],
+  "parts": [
+    { "x": 486, "y": 556, "route": "side", "img": "images/product-knob.png", "title": "다방향 컨트롤 노브", "points": ["재생, 일시정지, 곡 넘기기, 볼륨 조절", "전원, 블루투스 페어링, 전화 수신까지 한 번에", "노브 하나로 완성하는 음악 제어"] },
+    { "x": 479, "y": 481, "route": "side", "img": "images/product-m.png", "title": "사용자 설정 가능한 M 버튼", "points": ["자주 쓰는 기능을 담는 나만의 버튼", "사운드 설정, 음성 비서 등 앱에서 지정", "버튼 한 번으로 원하는 기능 실행"] },
+    { "x": 139, "y": 484, "route": "below", "img": "images/product-anc.png", "title": "노이즈 캔슬링 ANC 버튼", "points": ["버튼 한 번으로 노이즈 캔슬링, 주변음 허용 모드 전환", "소음 차단은 물론, 필요할 때 주변 소리까지", "Marshall Bluetooth 앱에서 노이즈 제어 수준 조절"] },
+    { "x": 520, "y": 317, "route": "side", "img": "images/product-compact.png", "title": "견고한 접이식 디자인", "points": ["높은 내구성의 견고한 구조", "접어서 간편하게 보관"] },
+    { "x": 218, "y": 392, "route": "below", "img": "images/product-ear.png", "title": "개선된 이어 쿠션", "points": ["이중 폼 솔루션으로 편안한 착용감 제공", "귀에 밀착되어 주변 소음 차단"] },
+    { "x": 311, "y": 52, "route": "down", "img": "images/product-band.png", "title": "내부 실리콘 밴드", "points": ["헤드폰 무게를 고르게 분산", "압력을 받는 부분이 없도록 설계"] }
+  ],
+  "details": [
+    { "title": "특징", "open": true, "type": "features", "items": [
+      { "icon": "wave", "title": "Marshall 시그니처 사운드", "desc": "다이내믹 라우드니스로 어떤 볼륨에도 완벽하게 조율된 사운드 제공." },
+      { "icon": "anc", "title": "액티브 노이즈 캔슬링 및 투명 모드", "desc": "주변 소음을 감지하여 차단 또는 필요에 따라 주변 소리를 증폭해 주는 기능." },
+      { "icon": "clock", "title": "무선 재생 시간", "desc": "액티브 노이즈 캔슬링 사용 시 70시간, 미사용 시 100시간 재생 가능." },
+      { "icon": "fold", "title": "견고한 폴더블 디자인", "desc": "내구성이 뛰어나며 쉽게 보관할 수 있는 접이식 디자인." },
+      { "icon": "m", "title": "사용자 설정 가능한 M 버튼", "desc": "EQ 설정, 스포티파이, 음성 어시스턴트 등을 손쉽게 탐색." },
+      { "icon": "bt", "title": "Bluetooth LE 오디오 지원", "desc": "최신 연결성을 위한 미래 지향적 기술." },
+      { "icon": "stage", "title": "사운드 스테이지 공간 오디오", "desc": "몰입감 있는 풍부한 사운드 경험." },
+      { "icon": "adapt", "title": "어댑티브 라우드니스", "desc": "주변 환경에 따라 톤 밸런스 조정." },
+      { "icon": "knob", "title": "다방향 컨트롤 노브", "desc": "블루투스, 재생, 볼륨 및 전원 제어." }
+    ] },
+    { "title": "구성품", "type": "box", "images": ["images/Items-01.png", "images/Items-02.png"],
+      "items": ["Monitor III A.N.C 헤드폰", "USB-C 충전 케이블", "USB-C to 3.5mm 오디오 케이블", "빠른 시작 가이드", "법적 및 안전 정보", "휴대용 케이스"] },
+    { "title": "Audio Specification", "type": "rows", "rows": [
+      ["드라이버 종류", "다이내믹"], ["드라이버 감도", "91 dB SPL(-18 dBFS @ 1kHz)"], ["드라이버 임피던스", "46 Ω"], ["주파수 범위", "20-20,000 Hz"], ["드라이버", "32 mm"]
+    ] },
+    { "title": "Controls and Connectivity", "type": "rows", "rows": [
+      ["무선 연결", "Bluetooth 5.3"], ["유선 연결", "USB-C to 3.5mm"], ["블루투스 범위", "10 m / 30 ft"], ["사운드 커스터마이징", "예"], ["컨트롤", "컨트롤 노브, ANC 버튼, M 버튼"],
+      ["음성 명령", "아니요"], ["코덱", "SBC, MPEG-2 AAC"], ["마이크 & 리모컨", "예"], ["액티브 노이즈 캔슬링", "네"]
+    ] },
+    { "title": "Physical Unit", "type": "rows", "rows": [
+      ["무게", "250 g\n8.8 oz"], ["방수", "아니요"], ["색상", "블랙\n크림\n피치"], ["접이식 디자인", "네"], ["헤드폰 종류", "오버이어"], ["제조국", "본 제품은 스웨덴에서 디자인, 설계 및 엔지니어링되었습니다. Made in China."]
+    ] },
+    { "title": "Battery", "type": "rows", "rows": [
+      ["재생 시간", "블루투스 및 액티브 노이즈 캔슬링 사용 시 70시간\n블루투스만 사용 시 100시간"], ["배터리 절약", "네"], ["무선 충전", "아니요"], ["고속 충전", "15분 충전 시 12시간 재생 가능"], ["충전 시간", "완충까지 2시간 30분 소요"]
+    ] },
+    { "title": "Compatible Apps", "type": "rows", "rows": [["앱", "Marshall Bluetooth 앱"]] },
+    { "title": "고객지원 및 기타 정보", "type": "rows", "rows": [["소프트웨어 및 펌웨어 업데이트", "2년*"], ["수리 서비스", "보증 및 수리"]],
+      "note": "*최소 지원 기간은 Marshall이 제품을 마지막으로 유통하거나 판매한 날짜부터 시작합니다.",
+      "buttons": [{ "label": "설명서 다운로드", "href": "https://www.marshall.com" }, { "label": "도움말 및 고객 지원", "href": "https://www.marshall.com" }] }
+  ],
+  "colors": [
+    { "name": "Black", "photo": "images/product-black.png", "gallery": ["images/product-black-01.png", "images/product-black-02.png", "images/product-black-03.png", "images/product-black-04.png"] },
+    { "name": "Cream", "photo": "images/product-cream.png", "gallery": ["images/product-cream-03.png", "images/product-cream-02.png", "images/product-cream-01.png", "images/product-cream-04.png"] },
+    { "name": "Pitch Black", "photo": "images/product-pitch-black.png", "gallery": ["images/product-pitch-black-01.png", "images/product-pitch-black-02.png", "images/product-pitch-black-03.png", "images/product-pitch-black-04.png"] }
+  ]
+}

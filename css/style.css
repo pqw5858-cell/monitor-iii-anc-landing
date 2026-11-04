@@ -1,0 +1,378 @@
+/* layout: dark editorial scroll story — particle intro ending on the hero, a "Turn it on." bridge, three press-a-key scenes scrolled side by side, then battery, parts, colour, details, purchase and footer */
+:root {
+  --bg: #0a0908;
+  --bg2: #141210;
+  --fg: #efe9dd;
+  --muted: #8f877b;
+  --line: #2a2622;
+  --accent: #c8a15a;
+  --glow: #ecd3a0;
+  --plane: #e6dac3;
+  --ink: #0b0a09;
+  --ink2: #4a443b;
+  /* English: Crimson Text, Korean falls through to Pretendard */
+  --display: "Crimson Text", "Pretendard", serif;
+  --body: "Pretendard", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body { font-family: var(--body); font-weight: 300; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 80; background: var(--bg); }
+html.locked, html.locked body { overflow: hidden; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font-family: var(--display); font-weight: 600; letter-spacing: .22em; text-transform: uppercase; font-size: 12px; color: var(--accent); margin: 0 0 12px; }
+
+/* scrollbar: glowing brass thumb on a dark track, no arrow buttons */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #0a0908; }
+::-webkit-scrollbar-thumb { border: 0; border-radius: 0; background: #c8a15a; box-shadow: 0 0 10px 2px rgba(232,200,130,.75), inset 0 0 5px rgba(255,236,190,.65); }
+::-webkit-scrollbar-thumb:hover { background: #d4ae68; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+@supports not selector(::-webkit-scrollbar) { html { scrollbar-color: #c8a15a #0a0908; scrollbar-width: thin; } }
+
+/* custom cursor (mouse only): small white dot that inverts what is under it (mix-blend difference);
+   grows on big headings (.big) and clickables (.link); on brass buttons it turns into a thin white ring (.ring, no invert) */
+/* the box follows the mouse instantly; only the circle inside (::after) eases its size */
+.cursor { position: fixed; left: 0; top: 0; z-index: 100; width: 80px; height: 80px; margin: -40px 0 0 -40px; pointer-events: none; display: none;
+  mix-blend-mode: difference; transform: translate3d(var(--x, -100px), var(--y, -100px), 0); transition: opacity .25s; will-change: transform; }
+.cursor::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #fff; border: 1.5px solid transparent; transform: scale(.225);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), background .25s, border-color .25s; }
+html.has-cursor .cursor { display: block; }
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+.cursor.link::after { transform: scale(.5); }
+.cursor.big::after { transform: scale(1); }
+.cursor.ring { mix-blend-mode: normal; }
+.cursor.ring::after { background: transparent; border-color: #fff; transform: scale(.6); }
+.cursor.hide { opacity: 0; }
+
+/* film grain */
+.grain { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .04; background-repeat: repeat; background-size: 180px 180px; }
+
+/* entrance gate (sound on / off) — shown over everything until a choice is made; header hidden meanwhile */
+.gate { position: fixed; inset: 0; z-index: 85; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; text-align: center; transition: opacity .9s ease, visibility 0s .9s; }
+.gate.out { opacity: 0; visibility: hidden; pointer-events: none; }
+.gate-line { position: absolute; left: 50%; top: 0; width: 1px; height: 19vh; margin-left: -.5px; overflow: hidden; background: rgba(255,255,255,.22); }
+.gate-line::after { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 45%; background: linear-gradient(180deg, transparent, #fff); animation: line-flow 2.4s ease-in-out infinite; }
+.gate h1 { margin: -4vh 0 0; font: 400 clamp(48px, 4.6vw, 88px)/1.1 var(--display); color: #f3efe6; }
+.gate h1 em { color: #d9d1c1; }
+.gate p { margin: 34px 0 0; font: 400 clamp(15px, .95vw, 18px)/2.1 var(--body); color: #a59d8f; }
+.gate p small { font-size: .92em; }
+.gate-btns { display: flex; gap: 40px; margin-top: 44px; }
+.gate-btns button { position: relative; width: 96px; height: 96px; display: grid; place-items: center; padding: 0; border-radius: 50%; background: transparent; cursor: pointer; transition: border-color .3s, background .3s, box-shadow .3s; }
+.gate-btns svg { width: 34px; height: 34px; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; transition: stroke .3s; }
+.gate-btns span { position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: 400 13px/1 var(--display); letter-spacing: .08em; color: #8f877b; opacity: 0; transition: opacity .3s; }
+.gate-btns button:hover span, html.tabbing .gate-btns button:focus-visible span { opacity: 1; }
+.gate-btns .on { border: 1px solid rgba(200,161,90,.75); } .gate-btns .on svg { stroke: #d6b679; }
+.gate-btns .on:hover { border-color: #d6b679; background: rgba(200,161,90,.08); box-shadow: 0 0 22px rgba(200,161,90,.25); }
+.gate-btns .off { border: 1px solid rgba(255,255,255,.22); } .gate-btns .off svg { stroke: #b8b2a8; }
+.gate-btns .off:hover { border-color: rgba(255,255,255,.6); } .gate-btns .off:hover svg { stroke: #fff; }
+html.gated .hdr { opacity: 0; pointer-events: none; }
+html.gated, html.gated body { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .gate-line::after { animation: none; transform: translateY(120%); } }
+
+/* header */
+.hdr { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 70; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 14px; pointer-events: none; transition: background .4s; }
+.hdr > * { pointer-events: auto; }
+.brand, .menu { transition: opacity .5s; }
+.hdr.in-intro .brand, .hdr.in-intro .menu { opacity: 0; pointer-events: none; }
+.hdr.solid { background: rgba(10,9,8,.78); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.brand { display: block; line-height: 0; }
+.brand img { width: 36px; height: 36px; display: block; }
+.menu { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: clamp(28px, 6vw, 96px); }
+.menu a { font: 500 15px var(--display); letter-spacing: .04em; color: rgba(255,255,255,.45); text-decoration: none; transition: color .3s; }
+.menu a:hover, .menu a[aria-current="true"] { color: #fff; }
+.sound { position: relative; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; cursor: pointer; border-radius: 50%; border: 1px solid rgba(255,255,255,.55); background: rgba(10,9,8,.55); transition: border-color .3s, background .3s; }
+.sound img { width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: .55; transition: opacity .3s; }
+.sound::after { content: ""; position: absolute; left: 50%; top: 50%; width: 24px; height: 1.5px; background: #fff; border-radius: 1px; transform: translate(-50%, -50%) rotate(-45deg); opacity: .8; transition: opacity .3s; }
+.sound.on img { opacity: 1; } .sound.on::after { opacity: 0; }
+.sound:hover { border-color: #fff; background: rgba(255,255,255,.12); }
+.sound.on { border-color: #fff; }
+html.locked .brand, html.locked .menu { opacity: 0; pointer-events: none; }
+.btn { white-space: nowrap; cursor: pointer; font: 400 13px var(--body); color: var(--fg); background: rgba(10,9,8,.55); border: 1px solid rgba(239,233,221,.22); border-radius: 999px; padding: 9px 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { border-color: #fff; }
+/* focus rings only while moving with the Tab key (html.tabbing, common.js) — never after clicks or the scene keys A/K/M */
+*:focus, *:focus-visible { outline: none; }
+html.tabbing :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+html.tabbing .exp-next:focus-visible, html.tabbing .exp-down:focus-visible, html.tabbing .press:focus-visible { outline: none; }
+
+/* intro */
+.intro-track { position: relative; height: 620vh; }
+.intro-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; }
+.intro-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* hero photos: placed 1:1 to the 1920x1080 design (hero.png), widths follow the screen width */
+.hero-photos img { position: absolute; display: block; height: auto; opacity: 0; pointer-events: none; will-change: opacity; }
+.hero-photos .ph1 { left: 8.39vw; top: 0; width: 22.15vw; }
+.hero-photos .ph2 { left: -2.19vw; top: 73.8vh; width: 17.5vw; }
+/* bottom-right photo: top edge fades into the background */
+.hero-photos .ph3 { right: 0; bottom: 0; width: 17.23vw; -webkit-mask-image: linear-gradient(180deg, transparent, #000 40%); mask-image: linear-gradient(180deg, transparent, #000 40%); }
+.hero-logo { position: absolute; display: block; pointer-events: none; opacity: 0; transition: opacity .2s; filter: drop-shadow(0 6px 22px rgba(0,0,0,.55)); }
+.hero-logo.on { opacity: 1; }
+.scroll-down { position: absolute; left: 50%; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: 96px; height: 96px; border-radius: 50%; background: rgba(255,255,255,.08); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; pointer-events: none; }
+.scroll-down .mouse { position: relative; width: 22px; height: 36px; border: 2px solid #fff; border-radius: 11px; }
+.scroll-down .mouse i { position: absolute; left: 50%; top: 9px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #fff; animation: wheel 1.6s ease-in-out infinite; }
+.scroll-down .label { font: 600 14px/1 var(--display); color: #fff; letter-spacing: .02em; }
+@keyframes wheel { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(13px); opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .scroll-down .mouse i { animation: none; } }
+
+/* pinned-stage layers (experience, product): opacity set by hub.js; .cur shows their .rv copy, .live makes them clickable */
+.fl { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.fl.live { pointer-events: auto; }
+.rv { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s ease; }
+.cur .rv { opacity: 1; transform: none; }
+
+/* turn it on — first layer of the experience stage (Experience-01.png) */
+.turn { overflow: hidden; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.turn::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 80.2vh; background: url("../images/turn-bg.jpg") center bottom / cover no-repeat; filter: brightness(.68);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%); mask-image: linear-gradient(180deg, transparent, #000 30%); }
+.turn-copy { position: relative; translate: 0 -6vh; }
+.turn h2 { margin: 0 0 22px; font: 400 clamp(56px, 5.4vw, 104px)/1 var(--display); color: #fff; }
+.turn p { margin: 0; font: 400 clamp(16px, 1.05vw, 20px)/2 var(--body); color: rgba(255,255,255,.9); }
+.turn .turn-cta { margin-top: 48px; }
+.turn-line { position: absolute; left: 50%; top: 64.7vh; width: 1px; height: 20.8vh; margin-left: -.5px; overflow: hidden; background: rgba(255,255,255,.28); }
+.turn-line::after { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 40%; background: linear-gradient(180deg, transparent, #fff); animation: line-flow 2.2s ease-in-out infinite; }
+@keyframes line-flow { 0% { transform: translateY(-100%); } 100% { transform: translateY(250%); } }
+.turn p.rv { transition-delay: .15s; } .turn .turn-cta.rv { transition-delay: .3s; } .turn-line.rv { transition-delay: .45s; }
+@media (prefers-reduced-motion: reduce) { .turn-line::after { animation: none; transform: translateY(150%); } }
+
+/* experience — Turn layer + three scenes side by side inside one pinned stage (Experience-02~04.png); track height set by hub.js */
+.exp-track { position: relative; height: 340vh; }
+.exp-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; overflow: clip; background: var(--bg); user-select: none; -webkit-user-select: none; }
+.exp-strip { position: absolute; inset: 0; display: flex; will-change: transform; }
+.exp { position: relative; flex: 0 0 100vw; width: 100vw; height: 100%; overflow: hidden; background: #000; }
+.exp .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* ear cup shadows close in from both sides as the feature turns on (earlier wear effect); fixed on the stage */
+.cups { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+.cup { position: absolute; top: -20%; width: 62vw; height: 140%; border-radius: 50%; will-change: transform; background: radial-gradient(closest-side, #000 72%, rgba(0,0,0,.85) 84%, rgba(0,0,0,0) 100%); }
+.cup.l { right: 100%; } .cup.r { left: 100%; }
+.rim { position: absolute; inset: 0; pointer-events: none; opacity: 0; box-shadow: inset 0 0 90px 14px rgba(236,211,160,.26), inset 0 0 2px 1px rgba(236,211,160,.55); }
+.press { position: absolute; left: 50%; top: 41vh; transform: translateX(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 22px; cursor: pointer; transition: opacity .5s; }
+.press:focus { outline: none; }
+html.tabbing .press:focus-visible .keycap { box-shadow: 0 0 0 4px rgba(255,255,255,.25); }
+.press-txt { margin: 0; font: 400 clamp(16px, 1.05vw, 20px)/1 var(--body); color: #fff; white-space: nowrap; text-shadow: 0 1px 12px rgba(0,0,0,.55); }
+.keycap { position: relative; display: grid; place-items: center; width: 60px; height: 60px; margin-right: 30px; border: 2px solid #fff; border-radius: 8px; font: 600 26px/1 var(--display); color: #fff; filter: drop-shadow(0 2px 10px rgba(0,0,0,.45)); animation: keypress 2s ease-in-out infinite; }
+.keycap img { position: absolute; left: 22px; top: 30px; width: 70px; height: 70px; }
+@keyframes keypress { 0%, 55%, 100% { transform: none; } 65% { transform: translateY(3px) scale(.96); } }
+.exp.on .press { opacity: 0; pointer-events: none; }
+/* scrolled before pressing the key: the hint shakes */
+.press.nudge { animation: shake .45s ease; }
+@keyframes shake { 20% { translate: -9px 0; } 40% { translate: 9px 0; } 60% { translate: -5px 0; } 80% { translate: 5px 0; } }
+.feature { position: absolute; left: 0; right: 0; top: calc(41vh - 4px); z-index: 3; text-align: center; opacity: 0; pointer-events: none; transition: opacity .8s .2s; text-shadow: 0 1px 3px rgba(0,0,0,.55), 0 2px 18px rgba(0,0,0,.6); }
+/* soft dark pool behind the copy so it reads on bright scenes (room light, lake sky) */
+.feature::before { content: ""; position: absolute; left: 50%; top: 50%; z-index: -1; width: min(980px, 70vw); height: 52vh; transform: translate(-50%, -32%); background: radial-gradient(closest-side, rgba(0,0,0,.58), rgba(0,0,0,.3) 55%, rgba(0,0,0,0)); }
+.feature .feat { margin: 0 0 10px; font: 600 clamp(14px, 1.05vw, 20px)/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.feature .sub { margin: 0; font: 600 clamp(22px, 1.9vw, 34px)/1.3 var(--body); color: #fff; }
+.exp.on .feature { opacity: 1; }
+/* after connecting: scroll hint + line until the visitor starts scrolling */
+.scroll-cue { position: absolute; left: 0; right: 0; top: 60vh; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 22px; opacity: 0; pointer-events: none; transition: opacity .6s; }
+.scroll-cue p { margin: 0; padding: 7px 16px; border-radius: 999px; background: rgba(0,0,0,.32); font: 500 clamp(15px, .95vw, 18px)/1.5 var(--body); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.scroll-cue .scroll-down { position: relative; left: auto; bottom: auto; transform: none; background: rgba(0,0,0,.32); }
+.exp.cue .scroll-cue { opacity: 1; transition-delay: .9s; }
+/* status line sits on top of the centre copy (feature name, one-liner) */
+.status { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 0 18px; white-space: nowrap; font-family: var(--display); font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #d8d0c0; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #6b645a; transition: background .6s, box-shadow .6s; }
+.exp.on .status { color: var(--glow); }
+.exp.on .dot { background: var(--glow); box-shadow: 0 0 12px var(--glow); }
+.vol { display: flex; align-items: flex-end; gap: 3px; height: 14px; margin-left: 6px; }
+.vol i { width: 3px; height: 30%; border-radius: 1px; background: rgba(255,255,255,.22); transition: background .25s; }
+.vol i:nth-child(n+4) { height: 50%; } .vol i:nth-child(n+7) { height: 70%; } .vol i:nth-child(n+10) { height: 100%; }
+.vol i.on { background: var(--glow); }
+/* next scene: dark gradient on the right + arrow */
+/* after the last scene: the way on is down, not sideways */
+.exp-down { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: 34vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 0 calc(64px + env(safe-area-inset-bottom, 0px)); border: 0; color: #fff; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.75)); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .45s; }
+.exp-down.show { opacity: 1; pointer-events: auto; }
+.exp-down:focus { outline: none; }
+.exp-down span { font: 600 15px/1 var(--display); letter-spacing: .2em; text-transform: uppercase; opacity: .8; transition: opacity .35s; }
+.exp-down svg { width: 40px; height: 40px; fill: none; stroke: #fff; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; animation: nudge-y 1.8s ease-in-out infinite; }
+.exp-down:hover span, html.tabbing .exp-down:focus-visible span { opacity: 1; }
+@keyframes nudge-y { 0%, 100% { transform: none; } 50% { transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .exp-down svg { animation: none; } }
+/* the whole right third is the button; hover darkens the gradient and pushes the arrow */
+.exp-next { position: absolute; top: 0; right: 0; bottom: 0; z-index: 5; width: 34vw; display: flex; align-items: center; justify-content: flex-end; gap: 14px; padding: 0 3.2vw 0 0; border: 0; color: #fff; background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.35) 50%, rgba(0,0,0,.82)); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .45s, background-color .35s; }
+.exp-next::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.35)); opacity: 0; transition: opacity .35s; }
+.exp-next:hover::before { opacity: 1; }
+.exp-next::after { content: "NEXT"; position: relative; order: -1; font: 600 14px/1 var(--display); letter-spacing: .2em; opacity: .7; transition: opacity .35s, transform .35s; }
+.exp-next:hover::after { opacity: 1; transform: translateX(-4px); }
+.exp-next svg { position: relative; transition: transform .35s; }
+.exp-next:hover svg { transform: translateX(6px) scale(1.1); }
+.exp-next.show { opacity: 1; pointer-events: auto; }
+.exp-next:focus { outline: none; }
+html.tabbing .exp-next:focus-visible svg { filter: drop-shadow(0 0 6px #fff); }
+.exp-next svg { width: 52px; height: 52px; fill: none; stroke: #fff; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; animation: nudge-x 1.8s ease-in-out infinite; }
+@keyframes nudge-x { 0%, 100% { transform: none; } 50% { transform: translateX(8px); } }
+.exp-next.nudge { animation: shake .45s ease; }
+/* scene bar under the menu: 01 Café · 02 Bedroom · 03 Lake park | Skip */
+.exp-nav { position: absolute; left: 50%; top: 84px; z-index: 6; transform: translateX(-50%); display: flex; align-items: center; gap: 30px; opacity: 0; pointer-events: none; transition: opacity .5s; }
+.exp-nav.show { opacity: 1; pointer-events: auto; }
+.exp-nav button { position: relative; padding: 6px 0; border: 0; background: none; cursor: pointer; white-space: nowrap; font: 400 16px/1 var(--display); letter-spacing: .04em; color: rgba(255,255,255,.5); text-shadow: 0 1px 10px rgba(0,0,0,.6); transition: color .3s; }
+.exp-nav button b { margin-right: 8px; font-size: 12px; font-weight: 600; letter-spacing: .1em; }
+.exp-nav button:hover, .exp-nav button[aria-current="true"] { color: #fff; }
+.exp-nav button[aria-current="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: #fff; }
+.exp-nav button.done::before { content: ""; position: absolute; right: -9px; top: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.skip-sep { width: 1px; height: 14px; background: rgba(255,255,255,.3); }
+.exp-nav .skip { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) { .keycap, .exp-next svg, .press.nudge, .exp-next.nudge { animation: none; } }
+
+/* product — battery, parts, colour layered on one pinned stage; the track's negative top margin (hub.js) overlaps the experience track */
+.prod-track { position: relative; height: 555vh; margin-top: -100vh; }
+/* transparent: it slides in over the experience stage while that is still showing; the layers carry their own black */
+.prod-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; }
+
+/* shared inner width for the product sections (battery, details, colour, purchase) */
+.inner { width: min(1010px, calc(100% - 32px)); margin: 0 auto; }
+
+/* battery (Product-battery.png, scaled from the 1248px design inner to 1010px) */
+.battery { background: #000; color: #fff; display: flex; align-items: center; padding: 64px 0 0; }
+.bat-top { display: grid; grid-template-columns: 556px 1fr; align-items: start; }
+.bat-num { position: relative; height: 400px; }
+.bat-num span { position: absolute; left: 0; top: -36px; font: 500 300px/1 var(--body); letter-spacing: -.02em; color: transparent; -webkit-text-stroke: 2px #fff; }
+.bat-num img { position: absolute; left: 112px; top: 96px; width: 250px; height: auto; filter: drop-shadow(0 20px 40px rgba(0,0,0,.6)); }
+.bat-copy h2 { margin: 0 0 54px; font: 400 80px/1.08 var(--display); color: #fff; white-space: nowrap; }
+.bat-bars { width: 420px; }
+.bat-row + .bat-row { margin-top: 32px; }
+.bat-row p { display: flex; justify-content: space-between; margin: 0 0 10px; font: 400 17px/1 var(--body); }
+.bat-row b { font-weight: 400; }
+.track { position: relative; height: 20px; border-radius: 10px; background: rgba(255,255,255,.14); overflow: hidden; }
+.track i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 10px; transition: width 1.4s cubic-bezier(.2,.7,.2,1); }
+.track .avg { background: #6a6a6a; }
+.track.mine { overflow: visible; }
+.track .off { background: #b8964f; box-shadow: 0 0 18px rgba(232,205,140,.45); }
+.track .on { background: #ecd9a8; transition-delay: .25s; }
+.battery.cur .track i { width: var(--w); }
+.battery .track i { transition-delay: .5s; } .battery .track .on { transition-delay: .75s; }
+.battery:not(.cur) .track i { transition: none; }
+.legend { display: flex; gap: 26px; margin: 14px 0 0; padding: 0; list-style: none; font: 400 17px/1 var(--body); }
+.legend li { display: flex; align-items: center; gap: 9px; }
+.legend li::before { content: ""; width: 20px; height: 20px; border-radius: 4px; }
+.legend .on::before { background: #ecd9a8; } .legend .off::before { background: #b8964f; }
+.bat-facts { display: flex; justify-content: space-between; margin: 56px 0 0; padding: 40px 0 36px; border-top: 1px solid rgba(255,255,255,.28); border-bottom: 1px solid rgba(255,255,255,.28); list-style: none; }
+.bat-facts h3 { display: flex; align-items: center; gap: 12px; height: 30px; margin: 0 0 18px; font: 500 24px/1 var(--body); }
+.bat-facts p { margin: 0; font: 400 18px/1 var(--body); }
+.bat-note { margin: 18px 0 0; font: 400 13px/1.5 var(--body); color: rgba(255,255,255,.5); }
+
+/* details (Product-details.png, design shown at 1535px → sizes ×1.25): accordion, several groups can be open at once */
+.details { background: #000; color: #fff; padding: 140px 0 160px; }
+.details h2 { margin: 0 0 80px; text-align: center; font: 400 96px/1 var(--display); }
+.acc-item { border-bottom: 1px solid rgba(255,255,255,.75); }
+.acc-item > h3 { margin: 0; }
+.acc-head { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 16px 0 14px; border: 0; background: none; color: #fff; text-align: left; cursor: pointer; font: 400 28px/1.2 var(--display); }
+.acc-item.open .acc-head { border-bottom: 1px solid rgba(255,255,255,.75); }
+.acc-head svg { flex: none; width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s; }
+.acc-item.open .acc-head svg { transform: rotate(180deg); }
+html.tabbing .acc-head:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.acc-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1); }
+.acc-item.open .acc-body { grid-template-rows: 1fr; }
+.acc-in { overflow: hidden; min-height: 0; }
+.acc-feat { display: grid; grid-template-columns: 698px 1fr; grid-template-rows: repeat(5, auto); grid-auto-flow: column; gap: 46px 0; padding: 40px 0 38px; margin: 0; list-style: none; }
+.acc-feat li { display: grid; grid-template-columns: 52px 1fr; align-items: center; }
+.acc-feat svg { width: 30px; height: 30px; margin-left: 4px; fill: none; stroke: #fff; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.acc-feat b, .acc-feat span { display: block; font: 400 16px/1.6 var(--body); }
+.acc-feat b { margin-bottom: 4px; }
+.acc-box { display: grid; grid-template-columns: 465px 1fr; padding: 40px 0 76px 52px; }
+.acc-box .pics { display: flex; gap: 18px; }
+.acc-box .pics img { width: 200px; height: 200px; border-radius: 6px; }
+.acc-box ul { margin: 0; padding: 12px 0 0; list-style: none; font: 400 16px/2 var(--body); text-transform: uppercase; }
+.acc-rows { margin: 0; }
+.acc-rows .row { display: grid; grid-template-columns: 465px 1fr; padding: 17px 0 17px 52px; border-bottom: 1px solid rgba(255,255,255,.3); font: 400 16px/1.5 var(--body); }
+.acc-rows .row:last-child { border-bottom: 0; }
+.acc-rows dt { color: rgba(255,255,255,.62); }
+.acc-rows dd { margin: 0; white-space: pre-line; text-transform: uppercase; }
+.acc-note { margin: 0; padding: 4px 0 0 52px; font: 400 15px/1.6 var(--body); color: rgba(255,255,255,.8); }
+.acc-btns { display: flex; gap: 18px; padding: 28px 0 40px 52px; }
+.acc-btns a { display: grid; place-items: center; width: 300px; height: 56px; border: 1px solid #fff; color: #fff; text-decoration: none; font: 400 16px/1 var(--body); transition: background .25s, color .25s; }
+.acc-btns a:last-child, .acc-btns a:hover { background: #fff; color: #000; }
+.acc-btns a:last-child:hover { background: transparent; color: #fff; }
+
+/* parts (Product.png, Product-01~06.png): front view with six pulsing points; picking one slides the headphones left
+   and draws an elbow line to a close-up panel. stage is laid out 1:1 to the 1920px design (product.png at native size) */
+.parts { background: #000; color: #fff; display: flex; align-items: center; overflow: hidden; }
+.parts-stage { --shift: 326px; position: relative; width: 1184px; height: 653px; margin: 22px 0 0 calc(50% - 640px); }
+.parts-hp { position: absolute; left: var(--shift); top: 0; width: 616px; height: 653px; transition: left .8s cubic-bezier(.6,0,.2,1); }
+.parts.picked .parts-hp { left: 3px; }
+.parts-hp > img { display: block; width: 100%; height: 100%; }
+.part-dot { position: absolute; width: 50px; height: 50px; margin: -25px 0 0 -25px; padding: 0; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; background: rgba(205,205,205,.5); cursor: pointer; transition: background .3s, transform .3s; }
+.part-dot:hover { transform: scale(1.08); }
+.part-dot::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.7); animation: pulse 2.2s ease-out infinite; pointer-events: none; }
+.part-dot:nth-child(2n)::after { animation-delay: .6s; } .part-dot:nth-child(3n)::after { animation-delay: 1.2s; }
+@keyframes pulse { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
+.part-dot[aria-pressed="true"] { background: transparent; }
+.part-dot[aria-pressed="true"]::after { animation: none; opacity: 0; }
+html.tabbing .part-dot:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.parts-line { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.parts-line path { fill: none; stroke: rgba(255,255,255,.85); stroke-width: 1; }
+.part-panel { position: absolute; left: 784px; top: 26px; width: 400px; opacity: 0; transform: translateX(16px); transition: opacity .5s, transform .5s; pointer-events: none; }
+.parts.picked .part-panel { opacity: 1; transform: none; }
+.parts.picked .part-panel.swap { opacity: 0; transition-duration: .2s; }
+.part-panel img { display: block; width: 400px; height: 400px; border-radius: 10px; object-fit: cover; background: #1a1a1a; }
+.part-panel h3 { margin: 38px 0 0; padding-bottom: 12px; border-bottom: 1px solid #fff; font: 500 30px/1.2 var(--body); }
+.part-panel ul { margin: 22px 0 0; padding: 0 0 0 14px; list-style: none; }
+.part-panel li { position: relative; padding-left: 18px; font: 400 21px/1 var(--body); white-space: nowrap; }
+.part-panel li + li { margin-top: 28px; }
+.part-panel li::before { content: ""; position: absolute; left: 0; top: 50%; width: 4px; height: 4px; margin-top: -2px; border-radius: 50%; background: #fff; }
+.reveal { opacity: .12; transform: translateY(18px); transition: opacity .8s ease, transform .8s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* colour (Product-color.png): three 310x481 cards across the 1010px inner; hovering a card cycles its gallery photos */
+.colour { background: #000; color: #fff; display: flex; align-items: center; padding: 64px 0 0; }
+.colour h2 { margin: 0 0 50px; text-align: center; font: 400 100px/1 var(--display); }
+.colour-list { display: grid; grid-template-columns: repeat(3, 310px); justify-content: space-between; margin: 0; padding: 0; list-style: none; }
+.colour-card .ph { position: relative; width: 310px; height: 481px; overflow: hidden; background: #3a3a3a; }
+.colour-card .ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .5s; }
+.colour-card.sliding .ph > img { opacity: 0; }
+.colour-card .strip { position: absolute; inset: 0; display: flex; opacity: 0; transition: opacity .5s, transform .7s cubic-bezier(.6,0,.2,1); }
+.colour-card.sliding .strip { opacity: 1; }
+.colour-card .strip img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; }
+.colour-card .dots { position: absolute; left: 0; right: 0; bottom: 16px; display: flex; justify-content: center; gap: 7px; opacity: 0; transition: opacity .4s; }
+.colour-card.sliding .dots { opacity: 1; }
+.colour-card .dots button { width: 9px; height: 9px; padding: 0; border: 1px solid #fff; border-radius: 50%; background: transparent; cursor: pointer; }
+.colour-card .dots button[aria-current="true"] { background: #fff; }
+.colour-card p { margin: 12px 0 0; font: 600 22px/1.3 var(--display); }
+
+/* purchase (Product-Purchase.png): dark close-up photo on the left, copy + two buttons on the right of the 1010px inner */
+/* the whole section scales with the screen width like the 1920px design (--u = 1 design px, never above 1px):
+   photo 1716x686 from the left edge, its last 160px fade into black; copy placed at the design's x 1017 / y 283 */
+.purchase { --u: min(1px, calc(100vw / 1920)); position: relative; display: flex; align-items: center; height: calc(457 * var(--u));
+  background: #000 url("../images/product-bg.png") 0 0 / calc(1144 * var(--u)) calc(457 * var(--u)) no-repeat; color: #fff; }
+.purchase::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(0,0,0,0) calc(880 * var(--u)), #000 calc(1144 * var(--u))); }
+.purchase .inner { position: relative; width: auto; margin: 0; }
+.buy-copy { margin-left: calc(1017 * var(--u)); }
+.eyebrow-l { margin: 0 0 calc(6 * var(--u)); font: 400 calc(30 * var(--u))/1 var(--display); color: rgba(255,255,255,.72); }
+.purchase h2 { margin: 0 0 calc(72 * var(--u)); font: 400 calc(92 * var(--u))/1 var(--display); white-space: nowrap; }
+.buy-cta { display: flex; gap: calc(55 * var(--u)); }
+.buy-cta a { display: inline-flex; align-items: center; gap: calc(12 * var(--u)); height: calc(68 * var(--u)); padding: 0 calc(22 * var(--u)); font: 500 calc(20 * var(--u))/1 var(--body); color: #fff; text-decoration: none; white-space: nowrap; transition: background .25s, color .25s, border-color .25s, box-shadow .3s; }
+/* hover (design): same brass, soft brass glow around it */
+.buy-main { background: #b5965a; border: 1px solid #b5965a; border-radius: 4px; }
+.buy-main:hover { background: #c4a56a; border-color: #c4a56a; box-shadow: 0 0 8px rgba(232,200,130,.6), 0 0 26px rgba(200,161,90,.5); }
+.buy-main svg { width: calc(26 * var(--u)); height: calc(26 * var(--u)); fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* footer (reference image): thanks line, back-to-top arrow, three columns, legal line */
+.ft { background: #0b0b0b; color: #fff; padding: 56px 48px calc(32px + env(safe-area-inset-bottom, 0px)); }
+.ft-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,.14); }
+.ft-thanks { margin: 0; font: 400 64px/1.1 var(--display); }
+.ft-thanks em { color: #9a9a9a; }
+.to-top { display: grid; place-items: center; width: 52px; height: 52px; margin: 56px 0 0 0; padding: 0; border: 1.5px solid #fff; border-radius: 50%; background: none; cursor: pointer; transition: background .25s, transform .25s; }
+.to-top svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke .25s; }
+.to-top:hover { background: #fff; transform: translateY(-3px); }
+.to-top:hover svg { stroke: #000; }
+html.tabbing .to-top:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.ft-cols { display: grid; grid-template-columns: repeat(3, 1fr); padding: 32px 0 36px; border-bottom: 1px solid rgba(255,255,255,.14); }
+.ft-cols h3 { margin: 0 0 20px; font: 400 13px/1 var(--body); letter-spacing: .14em; color: #b5b5b5; }
+.ft-cols p { margin: 0 0 14px; font: 500 16px/1.3 var(--body); }
+.ft-cols p:last-child { margin-bottom: 0; }
+.ft-cols .dim { color: #8a8a8a; }
+.ft-cols a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.35); transition: border-color .25s; }
+.ft-cols a:hover { border-color: #fff; }
+.ft-legal { margin: 24px 0 0; font: 400 13px/1.8 var(--body); color: #8c8c8c; }
+
+@media (max-width: 760px) {
+  .menu { gap: 18px; }
+  .menu a { font-size: 12px; }
+  .brand img { width: 30px; height: 30px; }
+  .sound { width: 36px; height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .part-dot::after { animation: none; }
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
