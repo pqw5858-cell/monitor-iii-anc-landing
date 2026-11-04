@@ -171,6 +171,11 @@ function lakeScene(sec, info) {
   const BPM = 104, S16 = 60 / BPM / 4, arp = [76, 83, 80, 88, 76, 83, 79, 86, 74, 81, 78, 86, 74, 81, 78, 83], roots = [40, 40, 38, 38];
   S.video = makeVideo(info.video, false); const v = S.video;
   let towers = [], cur = 0;
+  // soft round light: stretched into horizontal glints on the water, small dots for the windows
+  const GLINT = document.createElement("canvas"); GLINT.width = GLINT.height = 64;
+  { const g = GLINT.getContext("2d"), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    r.addColorStop(0, "rgba(255,244,222,1)"); r.addColorStop(.3, "rgba(255,224,170,.55)"); r.addColorStop(1, "rgba(255,210,150,0)");
+    g.fillStyle = r; g.fillRect(0, 0, 64, 64); }
   S.size = () => {
     DPR = Math.min(devicePixelRatio || 1, 2); W = sec.clientWidth; H = sec.clientHeight; cv.width = W * DPR; cv.height = H * DPR;
     sparks = Array.from({ length: 300 }, () => { const d = Math.pow(Math.random(), 1.4); return { fx: .57 + (Math.random() - .5) * (.03 + d * .34) * (Math.random() + .3), fy: .42 + d * .4, d, ph: Math.random() * 6.28, sp: 2 + Math.random() * 6, hi: Math.random() }; });
@@ -226,15 +231,14 @@ function lakeScene(sec, info) {
         const tw = .5 + .5 * Math.sin(t * q.sp + q.ph), hit = lv * (q.hi < .55 ? 1 : .35) * (.4 + tw), a = clamp(hit * 1.4 * k);
         if (a < .03) continue;
         const x = c.x + c.w * q.fx + Math.sin(t * .8 + q.ph) * 5, y = c.y + c.h * q.fy, rr = (1 + q.d * 2.4) * (1 + hit * 1.6);
-        ctx.fillStyle = `rgba(255,226,170,${a})`; ctx.fillRect(x - rr * 2.2, y - rr * .35, rr * 4.4, rr * .7);
-        if (hit > .35 && q.hi < .25) ctx.fillRect(x - .5, y - rr * 2, 1, rr * 4);
+        ctx.globalAlpha = a * .85; ctx.drawImage(GLINT, x - rr * 3.2, y - rr * .7, rr * 6.4, rr * 1.4);
       }
       for (const q of towers) {
         const a = clamp(lv * k * (.3 + .7 * (.5 + .5 * Math.sin(t * q.sp * 3 + q.ph))) * (.4 + p));
         if (a < .04) continue;
-        ctx.fillStyle = `rgba(255,214,150,${a})`; ctx.fillRect(c.x + c.w * q.fx, c.y + c.h * q.fy, 2, 2);
+        ctx.globalAlpha = a; ctx.drawImage(GLINT, c.x + c.w * q.fx - 2.5, c.y + c.h * q.fy - 2.5, 5, 5);
       }
-      ctx.restore();
+      ctx.globalAlpha = 1; ctx.restore();
       if (lv > .02) { ctx.fillStyle = `rgba(255,240,210,${lv * .06})`; ctx.fillRect(0, 0, W, H); }
     }
     cv.style.filter = `blur(${lerp(5, 0, k).toFixed(2)}px) saturate(${lerp(.35, 1.08, k).toFixed(2)}) contrast(${lerp(.82, 1.06, k).toFixed(2)})`;

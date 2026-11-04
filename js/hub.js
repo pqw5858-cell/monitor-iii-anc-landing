@@ -45,6 +45,35 @@ function render(D) {
     const restart = () => { clearInterval(timer); timer = setInterval(() => go((k + 1) % c.gallery.length), 1600); };
     li.addEventListener("pointerenter", () => { go(0); li.classList.add("sliding"); restart(); });
     li.addEventListener("pointerleave", () => { clearInterval(timer); li.classList.remove("sliding"); });
+    // clicking the photo steps to the next one (the first click on touch just opens the strip)
+    let drag = null, dragged = false, opened = false;
+    ph.addEventListener("click", e => {
+      if (e.target.closest(".dots") || dragged) { dragged = false; return; }
+      if (opened) opened = false; else if (!li.classList.contains("sliding")) { go(0); li.classList.add("sliding"); } else go((k + 1) % c.gallery.length);
+      restart();
+    });
+    // drag / swipe sideways: the strip follows the pointer, a pull past 15% of the width turns the page
+    const n = c.gallery.length;
+    ph.addEventListener("pointerdown", e => {
+      if (e.button || e.target.closest(".dots")) return;
+      dragged = false; opened = false;
+      if (!li.classList.contains("sliding")) { go(0); li.classList.add("sliding"); opened = true; }
+      drag = { x: e.clientX, y: e.clientY, w: ph.clientWidth, dx: 0, on: false }; clearInterval(timer);
+    });
+    addEventListener("pointermove", e => {
+      if (!drag) return;
+      drag.dx = e.clientX - drag.x;
+      if (!drag.on && Math.abs(drag.dx) > 8 && Math.abs(drag.dx) > Math.abs(e.clientY - drag.y)) { drag.on = true; strip.style.transition = "opacity .5s"; try { ph.setPointerCapture(e.pointerId); } catch (_) {} }
+      if (drag.on) strip.style.transform = `translateX(calc(${-100 * k}% + ${drag.dx}px))`;
+    });
+    addEventListener("pointerup", () => {
+      if (!drag) return;
+      const d = drag; drag = null; strip.style.transition = "";
+      if (d.on) { dragged = true; const t = d.dx / d.w; go(t < -.15 ? (k + 1) % n : t > .15 ? (k - 1 + n) % n : k); }
+      if (li.matches(":hover")) restart();
+    });
+    ph.style.touchAction = "pan-y";
+    ph.addEventListener("dragstart", e => e.preventDefault());
   });
 }
 
@@ -175,8 +204,8 @@ function init(D) {
       if (d > 0) {
         if (!S.on) { nudge(S.pr); return true; }
         if (S.qT < 1) { S.qT = Math.min(1, S.qT + d / (H * Q_RUN)); if (S.qT >= 1) { S.done = true; S.doneAt = now; } return true; }
-        if (idx === last() && now - S.doneAt > EDGE_MS) { release(); return false; }
-        nudge(nextBtn); return true;
+        // the last scene moves on only by clicking "Product view" (or Skip / the menu), never by scrolling
+        nudge(idx === last() ? downBtn : nextBtn); return true;
       }
       if (S.on && S.qT > 0) { S.qT = Math.max(0, S.qT + d / (H * Q_RUN)); if (S.qT <= 0) S.zeroAt = now; return true; }
       if (idx === 0 && now - S.zeroAt > EDGE_MS) { release(); return false; }

@@ -202,6 +202,7 @@ html.tabbing .exp-next:focus-visible svg { filter: drop-shadow(0 0 6px #fff); }
 .exp-next svg { width: 52px; height: 52px; fill: none; stroke: #fff; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; animation: nudge-x 1.8s ease-in-out infinite; }
 @keyframes nudge-x { 0%, 100% { transform: none; } 50% { transform: translateX(8px); } }
 .exp-next.nudge { animation: shake .45s ease; }
+.exp-down.nudge span { animation: shake .45s ease; opacity: 1; }
 /* scene bar under the menu: 01 Café · 02 Bedroom · 03 Lake park | Skip */
 .exp-nav { position: absolute; left: 50%; top: 84px; z-index: 6; transform: translateX(-50%); display: flex; align-items: center; gap: 30px; opacity: 0; pointer-events: none; transition: opacity .5s; }
 .exp-nav.show { opacity: 1; pointer-events: auto; }
@@ -212,12 +213,12 @@ html.tabbing .exp-next:focus-visible svg { filter: drop-shadow(0 0 6px #fff); }
 .exp-nav button.done::before { content: ""; position: absolute; right: -9px; top: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 .skip-sep { width: 1px; height: 14px; background: rgba(255,255,255,.3); }
 .exp-nav .skip { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
-@media (prefers-reduced-motion: reduce) { .keycap, .exp-next svg, .press.nudge, .exp-next.nudge { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .keycap, .exp-next svg, .press.nudge, .exp-next.nudge, .exp-down.nudge span { animation: none; } }
 
 /* product — battery, parts, colour layered on one pinned stage; the track's negative top margin (hub.js) overlaps the experience track */
-.prod-track { position: relative; height: 555vh; margin-top: -100vh; }
+.prod-track { position: relative; height: 555vh; margin-top: -100vh; pointer-events: none; }
 /* transparent: it slides in over the experience stage while that is still showing; the layers carry their own black */
-.prod-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; }
+.prod-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; pointer-events: none; }
 
 /* shared inner width for the product sections (battery, details, colour, purchase) */
 .inner { width: min(1010px, calc(100% - 32px)); margin: 0 auto; }
@@ -250,6 +251,7 @@ html.tabbing .exp-next:focus-visible svg { filter: drop-shadow(0 0 6px #fff); }
 .bat-facts h3 { display: flex; align-items: center; gap: 12px; height: 30px; margin: 0 0 18px; font: 500 24px/1 var(--body); }
 .bat-facts p { margin: 0; font: 400 18px/1 var(--body); }
 .bat-note { margin: 18px 0 0; font: 400 13px/1.5 var(--body); color: rgba(255,255,255,.5); }
+.bat-note.rv { transition-delay: .3s; }
 
 /* details (Product-details.png, design shown at 1535px → sizes ×1.25): accordion, several groups can be open at once */
 .details { background: #000; color: #fff; padding: 140px 0 160px; }
@@ -291,8 +293,11 @@ html.tabbing .acc-head:focus-visible { outline: 2px solid #fff; outline-offset: 
 .parts-hp { position: absolute; left: var(--shift); top: 0; width: 616px; height: 653px; transition: left .8s cubic-bezier(.6,0,.2,1); }
 .parts.picked .parts-hp { left: 3px; }
 .parts-hp > img { display: block; width: 100%; height: 100%; }
-.part-dot { position: absolute; width: 50px; height: 50px; margin: -25px 0 0 -25px; padding: 0; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; background: rgba(205,205,205,.5); cursor: pointer; transition: background .3s, transform .3s; }
+.part-dot { position: absolute; width: 50px; height: 50px; margin: -25px 0 0 -25px; padding: 0; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; background: rgba(205,205,205,.5); cursor: pointer; transition: background .3s, transform .3s, opacity .5s; }
 .part-dot:hover { transform: scale(1.08); }
+/* dots only appear once the parts layer is fully on screen (before that they could not be clicked) */
+.parts:not(.live) .part-dot { opacity: 0; transform: scale(.6); pointer-events: none; }
+.parts.live .part-dot:nth-of-type(2) { transition-delay: 0s, .06s, .06s; } .parts.live .part-dot:nth-of-type(3) { transition-delay: 0s, .12s, .12s; } .parts.live .part-dot:nth-of-type(4) { transition-delay: 0s, .18s, .18s; } .parts.live .part-dot:nth-of-type(5) { transition-delay: 0s, .24s, .24s; } .parts.live .part-dot:nth-of-type(6) { transition-delay: 0s, .3s, .3s; }
 .part-dot::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.7); animation: pulse 2.2s ease-out infinite; pointer-events: none; }
 .part-dot:nth-child(2n)::after { animation-delay: .6s; } .part-dot:nth-child(3n)::after { animation-delay: 1.2s; }
 @keyframes pulse { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
@@ -317,7 +322,7 @@ html.tabbing .part-dot:focus-visible { outline: 2px solid #fff; outline-offset: 
 .colour { background: #000; color: #fff; display: flex; align-items: center; padding: 64px 0 0; }
 .colour h2 { margin: 0 0 50px; text-align: center; font: 400 100px/1 var(--display); }
 .colour-list { display: grid; grid-template-columns: repeat(3, 310px); justify-content: space-between; margin: 0; padding: 0; list-style: none; }
-.colour-card .ph { position: relative; width: 310px; height: 481px; overflow: hidden; background: #3a3a3a; }
+.colour-card .ph { position: relative; width: 310px; height: 481px; overflow: hidden; background: #3a3a3a; cursor: pointer; }
 .colour-card .ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .5s; }
 .colour-card.sliding .ph > img { opacity: 0; }
 .colour-card .strip { position: absolute; inset: 0; display: flex; opacity: 0; transition: opacity .5s, transform .7s cubic-bezier(.6,0,.2,1); }
